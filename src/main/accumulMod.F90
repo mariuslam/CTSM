@@ -712,12 +712,14 @@ contains
     do nf = 1,naccflds
 
        varname = trim(accum(nf)%name) // '_VALUE'
+       write(iulog,*) 'L715 varname',varname,"type1d",accum(nf)%type1d,'desc',accum(nf)%desc,'units',accum(nf)%units,'accum(nf)%numlev',accum(nf)%numlev !marius
        if (accum(nf)%numlev == 1) then
           call restartvar(ncid=ncid, flag=flag, varname=varname, xtype=ncd_double, &
                dim1name=accum(nf)%type1d, &
                long_name=accum(nf)%desc, units=accum(nf)%units, &
                interpinic_flag='interp', &
-               data=accum(nf)%val, readvar=readvar)
+               data=accum(nf)%val(accum(nf)%beg1d:accum(nf)%end1d ,1), readvar=readvar)
+               accum(nf)%val(accum(nf)%beg1d:accum(nf)%end1d ,1)=newpointer(accum(nf)%beg1d:accum(nf)%end1d)
        else
           call restartvar(ncid=ncid, flag=flag, varname=varname, xtype=ncd_double, &
                dim1name=accum(nf)%type1d, dim2name=accum(nf)%type2d, &

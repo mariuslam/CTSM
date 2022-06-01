@@ -370,6 +370,7 @@ contains
           call ncd_io(varname=trim(my_varname), data=data, &
                ncid=ncid, flag=flag, readvar=readvar)
        else 
+          write(iulog,*) 'L373 trim(my_varname)',trim(my_varname) !marius
           call ncd_io(varname=trim(my_varname), data=data, &
             dim1name=trim(dim1name), ncid=ncid, flag=flag, readvar=readvar)
        end if

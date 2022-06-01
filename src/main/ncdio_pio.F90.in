@@ -1928,6 +1928,7 @@ contains
                    end do
                 end do
              else
+                write(iulog,*) 'L1931 vardesc',vardesc,'start(1:n)',start(1:n),'count(1:n)',count(1:n),'data',data !marius
                 status = pio_get_var(ncid, vardesc, start(1:n), count(1:n), data)
              endif
           else
