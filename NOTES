@@ -1,0 +1,16 @@
+SoilBiogeochemCarbonFluxType.F90
+
+bounds:
+     ! GRID CELL INDEX           1           1
+     ! LANDUNIT INDEX            1           1
+     ! COLUMN INDEX              1           1
+     ! PATCH INDEX               1           15
+     ! COHORT INDEX              1           1500
+     ! PROC OR CLUMP LEVEL?      1
+     ! CLUMP INDEX              -1
+
+carbon_type:                     c12
+
+nlevdecomp_full:                 25 ! number of biogeochemical layers
+
+ndecomp_pools:                   6
