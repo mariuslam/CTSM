@@ -39,6 +39,7 @@ module SoilBiogeochemStateType
      real(r8) , pointer :: som_adv_coef_col            (:,:)   ! (m2/s) SOM advective flux 
      real(r8) , pointer :: som_diffus_coef_col         (:,:)   ! (m2/s) SOM diffusivity due to bio/cryo-turbation 
      real(r8) , pointer :: plant_ndemand_col           (:)     ! column-level plant N demand
+     real(r8), pointer :: docf_decomp_cascade_col      (:,:,:) ! (frac) doc fraction in decomposition step 
 
    contains
 
@@ -100,6 +101,9 @@ contains
     allocate(this%som_adv_coef_col    (begc:endc,1:nlevdecomp_full)) ; this%som_adv_coef_col    (:,:) = spval
     allocate(this%som_diffus_coef_col (begc:endc,1:nlevdecomp_full)) ; this%som_diffus_coef_col (:,:) = spval
     allocate(this%plant_ndemand_col   (begc:endc))                   ; this%plant_ndemand_col   (:)   = nan
+    
+    allocate(this%docf_decomp_cascade_col(begc:endc,1:nlevdecomp_full,1:ndecomp_cascade_transitions))
+    this%docf_decomp_cascade_col(:,:,:) = nan
 
     allocate(this%nue_decomp_cascade_col(1:ndecomp_cascade_transitions)); 
     this%nue_decomp_cascade_col(:) = nan

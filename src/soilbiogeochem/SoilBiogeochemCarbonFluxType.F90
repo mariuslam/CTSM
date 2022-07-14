@@ -6,7 +6,6 @@ module SoilBiogeochemCarbonFluxType
   use clm_varpar                         , only : ndecomp_cascade_transitions, ndecomp_pools, nlevcan
   use clm_varpar                         , only : nlevdecomp_full, nlevgrnd, nlevdecomp, nlevsoi, i_cwdl2
   use clm_varcon                         , only : spval, ispval, dzsoi_decomp
-  use clm_varctl                         , only : iulog
   use pftconMod                          , only : pftcon
   use landunit_varcon                    , only : istsoil, istcrop, istdlak 
   use ch4varcon                          , only : allowlakeprod

@@ -63,6 +63,20 @@ module SoilBiogeochemDecompCascadeBGCMod
   real(r8), private :: f_s2s1
   real(r8), private :: f_s2s3
 
+  real(r8) :: docf_l1s1
+  real(r8) :: docf_l2s1
+  real(r8) :: docf_l3s2
+
+  real(r8), allocatable :: docf_s1s2(:,:)
+  real(r8), allocatable :: docf_s1s3(:,:)
+
+  real(r8) :: docf_s2s1
+  real(r8) :: docf_s2s3
+  real(r8) :: docf_s3s1
+
+  real(r8) :: docf_cwdl2
+  real(r8) :: docf_cwdl3
+
   integer, private :: i_l1s1
   integer, private :: i_l2s1
   integer, private :: i_l3s2
@@ -87,6 +101,17 @@ module SoilBiogeochemDecompCascadeBGCMod
      real(r8):: rf_s3s1_bgc    
 
      real(r8):: rf_cwdl3_bgc
+
+     real(r8) :: docf_l1s1_bgc
+     real(r8) :: docf_l2s1_bgc
+     real(r8) :: docf_l3s2_bgc
+
+     real(r8) :: docf_s2s1_bgc
+     real(r8) :: docf_s2s3_bgc
+     real(r8) :: docf_s3s1_bgc
+
+     real(r8) :: docf_cwdl2_bgc
+     real(r8) :: docf_cwdl3_bgc
 
      real(r8):: tau_l1_bgc    ! 1/turnover time of  litter 1 from Century (l/18.5) (1/yr)
      real(r8):: tau_l2_l3_bgc ! 1/turnover time of  litter 2 and litter 3 from Century (1/4.9) (1/yr)
@@ -205,6 +230,46 @@ contains
     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
     params_inst%rf_cwdl3_bgc=tempr
 
+    tString='rf_l1s1_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_l1s1_bgc=tempr
+
+    tString='rf_l2s1_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_l2s1_bgc=tempr
+
+    tString='rf_l3s2_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_l3s2_bgc=tempr   
+
+    tString='rf_s2s1_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_s2s1_bgc=tempr
+
+    tString='rf_s2s3_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_s2s3_bgc=tempr
+
+    tString='rf_s3s1_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_s3s1_bgc=tempr
+
+    tString='rf_cwdl2_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_cwdl2_bgc=tempr
+
+    tString='rf_cwdl3_bgc'
+    call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
+    if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
+    params_inst%docf_cwdl3_bgc=tempr
+
     tString='bgc_cwd_fcel'
     call ncd_io(trim(tString),tempr, 'read', ncid, readvar=readv)
     if ( .not. readv ) call endrun(msg=trim(errCode)//trim(tString)//errMsg(sourcefile, __LINE__))
@@ -248,6 +313,7 @@ contains
     !-----------------------------------------------------------------------
 
     associate(                                                                                     &
+         docf_decomp_cascade            => soilbiogeochem_state_inst%docf_decomp_cascade_col     , & ! Input:  [real(r8)          (:,:,:) ]  DOC fraction in decomposition step (frac)
          cellsand                       => soilstate_inst%cellsand_col                           , & ! Input:  [real(r8)          (:,:)   ]  column 3D sand                                         
          
          cascade_donor_pool             => decomp_cascade_con%cascade_donor_pool                 , & ! Output: [integer           (:)     ]  which pool is C taken from for a given decomposition step 
@@ -268,6 +334,8 @@ contains
 
       allocate(rf_s1s2(bounds%begc:bounds%endc,1:nlevdecomp))
       allocate(rf_s1s3(bounds%begc:bounds%endc,1:nlevdecomp))
+      allocate(docf_s1s2(bounds%begc:bounds%endc,1:nlevdecomp))
+      allocate(docf_s1s3(bounds%begc:bounds%endc,1:nlevdecomp))
       allocate(f_s1s2(bounds%begc:bounds%endc,1:nlevdecomp))
       allocate(f_s1s3(bounds%begc:bounds%endc,1:nlevdecomp))
 
@@ -287,6 +355,17 @@ contains
 
       rf_cwdl3 = params_inst%rf_cwdl3_bgc
 
+      ! set doc fractions for fluxes between compartments
+      docf_l1s1 = params_inst%docf_l1s1_bgc
+      docf_l2s1 = params_inst%docf_l2s1_bgc
+      docf_l3s2 = params_inst%docf_l3s2_bgc
+      docf_s2s1 = params_inst%docf_s2s1_bgc
+      docf_s2s3 = params_inst%docf_s2s3_bgc
+      docf_s3s1 = params_inst%docf_s3s1_bgc
+
+      docf_cwdl2 = params_inst%docf_cwdl2_bgc
+      docf_cwdl3 = params_inst%docf_cwdl3_bgc
+
       ! set the cellulose and lignin fractions for coarse woody debris
       cwd_fcel = params_inst%cwd_fcel_bgc
 
@@ -302,6 +381,9 @@ contains
             f_s1s3(c,j) = .004_r8 / (1._r8 - t)
             rf_s1s2(c,j) = t
             rf_s1s3(c,j) = t
+            ! TODO check [kaveh] why do we start with 0?
+            docf_s1s2(c,j) = 0.0_r8
+            docf_s1s3(c,j) = 0.0_r8
          end do
       end do
       initial_stock_soildepth = params_inst%bgc_initial_Cstocks_depth
@@ -451,58 +533,76 @@ contains
       !----------------  list of transitions and their time-independent coefficients  ---------------!
       i_l1s1 = 1
       decomp_cascade_con%cascade_step_name(i_l1s1) = 'L1S1'
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l1s1) = docf_l1s1
       cascade_donor_pool(i_l1s1) = i_met_lit
       cascade_receiver_pool(i_l1s1) = i_act_som
 
       i_l2s1 = 2
       decomp_cascade_con%cascade_step_name(i_l2s1) = 'L2S1'
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l2s1) = docf_l2s1
       cascade_donor_pool(i_l2s1) = i_cel_lit
       cascade_receiver_pool(i_l2s1) = i_act_som
 
       i_l3s2 = 3
       decomp_cascade_con%cascade_step_name(i_l3s2) = 'L3S2'
+      ! TODO check [kaveh] Why is this set to 0?
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l3s2) = 0.00_r8
       cascade_donor_pool(i_l3s2) = i_lig_lit
       cascade_receiver_pool(i_l3s2) = i_slo_som
 
       i_s1s2 = 4
       decomp_cascade_con%cascade_step_name(i_s1s2) = 'S1S2'
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s1s2) = docf_s1s2(bounds%begc:bounds%endc,1:nlevdecomp)
       cascade_donor_pool(i_s1s2) = i_act_som
       cascade_receiver_pool(i_s1s2) = i_slo_som
 
       i_s1s3 = 5
       decomp_cascade_con%cascade_step_name(i_s1s3) = 'S1S3'
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s1s3) = docf_s1s3(bounds%begc:bounds%endc,1:nlevdecomp)
       cascade_donor_pool(i_s1s3) = i_act_som
       cascade_receiver_pool(i_s1s3) = i_pas_som
 
       i_s2s1 = 6
       decomp_cascade_con%cascade_step_name(i_s2s1) = 'S2S1'
+      ! TODO check [kaveh] Why is this set to 0?
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s1) = 0._r8
       cascade_donor_pool(i_s2s1) = i_slo_som
       cascade_receiver_pool(i_s2s1) = i_act_som
 
       i_s2s3 = 7 
       decomp_cascade_con%cascade_step_name(i_s2s3) = 'S2S3'
+      ! TODO check [kaveh] Why is this set to 0?
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s3) = 0._r8
       cascade_donor_pool(i_s2s3) = i_slo_som
       cascade_receiver_pool(i_s2s3) = i_pas_som
 
       i_s3s1 = 8
       decomp_cascade_con%cascade_step_name(i_s3s1) = 'S3S1'
+      ! TODO check [kaveh] Why is this set to 0?
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s3s1) = 0._r8
       cascade_donor_pool(i_s3s1) = i_pas_som
       cascade_receiver_pool(i_s3s1) = i_act_som
 
       if (.not. use_fates) then
          i_cwdl2 = 9
          decomp_cascade_con%cascade_step_name(i_cwdl2) = 'CWDL2'
+         ! TODO check [kaveh] Why is this set to 0?
+         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl2) = 0._r8
          cascade_donor_pool(i_cwdl2) = i_cwd
          cascade_receiver_pool(i_cwdl2) = i_cel_lit
          
          i_cwdl3 = 10
          decomp_cascade_con%cascade_step_name(i_cwdl3) = 'CWDL3'
+         ! TODO check [kaveh] Why is this set to 0?
+         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl3) = 0._r8
          cascade_donor_pool(i_cwdl3) = i_cwd
          cascade_receiver_pool(i_cwdl3) = i_lig_lit
       end if
  
       if(use_soil_matrixcn) call InitSoilTransfer()
 
+      deallocate(docf_s1s2)
+      deallocate(docf_s1s3)
       deallocate(params_inst%bgc_initial_Cstocks)
 
     end associate
