@@ -382,6 +382,8 @@ contains
             rf_s1s2(c,j) = t
             rf_s1s3(c,j) = t
             ! TODO check [kaveh] why do we start with 0?
+            docf_s1s2(c,1) = 0.0007143_r8
+            docf_s1s3(c,1) = 0.000143_r8
             docf_s1s2(c,j) = 0.0_r8
             docf_s1s3(c,j) = 0.0_r8
          end do
@@ -533,13 +535,13 @@ contains
       !----------------  list of transitions and their time-independent coefficients  ---------------!
       i_l1s1 = 1
       decomp_cascade_con%cascade_step_name(i_l1s1) = 'L1S1'
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l1s1) = docf_l1s1
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l1s1) = 0.000143_r8
       cascade_donor_pool(i_l1s1) = i_met_lit
       cascade_receiver_pool(i_l1s1) = i_act_som
 
       i_l2s1 = 2
       decomp_cascade_con%cascade_step_name(i_l2s1) = 'L2S1'
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l2s1) = docf_l2s1
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l2s1) = 0.00007143_r8
       cascade_donor_pool(i_l2s1) = i_cel_lit
       cascade_receiver_pool(i_l2s1) = i_act_som
 
