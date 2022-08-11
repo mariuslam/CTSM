@@ -44,6 +44,7 @@ module SoilBiogeochemDecompCascadeConType
      logical           , pointer  :: is_metabolic(:)                   ! TRUE => pool is metabolic material
      logical           , pointer  :: is_cellulose(:)                   ! TRUE => pool is cellulose
      logical           , pointer  :: is_lignin(:)                      ! TRUE => pool is lignin
+     logical           , pointer  :: is_doc(:)                         ! TRUE => pool is DOC
      real(r8)          , pointer  :: spinup_factor(:)                  ! factor by which to scale AD and relevant processes by
 
      ! Matrix data
@@ -153,6 +154,9 @@ contains
        ndecomp_cascade_transitions = 7
        ndecomp_pools_max           = 8
     end if
+
+    ndecomp_pools = ndecomp_pools + 2 ! Add 2 extra pools for DOC
+
     ! Set ndecomp_pools_vr needed for Matrix solution
 
   end subroutine decomp_cascade_par_init
@@ -195,6 +199,7 @@ contains
        allocate(decomp_cascade_con%is_metabolic(ibeg:ndecomp_pools))
        allocate(decomp_cascade_con%is_cellulose(ibeg:ndecomp_pools))
        allocate(decomp_cascade_con%is_lignin(ibeg:ndecomp_pools))
+       allocate(decomp_cascade_con%is_doc(ibeg:ndecomp_pools))
        allocate(decomp_cascade_con%spinup_factor(1:ndecomp_pools))
 
        ! Allocate soil matrix data
@@ -222,6 +227,7 @@ contains
        decomp_cascade_con%is_metabolic(ibeg:ndecomp_pools)                   = .false.
        decomp_cascade_con%is_cellulose(ibeg:ndecomp_pools)                   = .false.
        decomp_cascade_con%is_lignin(ibeg:ndecomp_pools)                      = .false.
+       decomp_cascade_con%is_doc(ibeg:ndecomp_pools)                         = .false.
        decomp_cascade_con%spinup_factor(1:ndecomp_pools)                     = nan
     end if
 

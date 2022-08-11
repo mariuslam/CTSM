@@ -41,8 +41,7 @@ module SoilBiogeochemCarbonStateType
      real(r8), pointer :: totdoc_col              (:)     ! (gC/m2) total dissolved organic carbon
      real(r8), pointer :: cwdc_col                (:)     ! (gC/m2) coarse woody debris C (diagnostic)
      real(r8), pointer :: decomp_cpools_1m_col    (:,:)   ! (gC/m2)  Diagnostic: decomposing (litter, cwd, soil) c pools to 1 meter
-     real(r8), pointer :: decomp_cpools_col       (:,:)   ! (gC/m2)  decomposing (litter, cwd, soil) c pools
-     real(r8), pointer :: decomp_docpools_col     (:,:)   ! (gC/m2)  decomposing (litter, soil) doc pools
+     real(r8), pointer :: decomp_cpools_col       (:,:)   ! (gC/m2)  decomposing (litter, cwd, soil, doc) c pools
      real(r8), pointer :: dyn_cbal_adjustments_col(:)     ! (gC/m2) adjustments to each column made in this timestep via dynamic column area adjustments (note: this variable only makes sense at the column-level: it is meaningless if averaged to the gridcell-level)
      integer           :: restart_file_spinup_state       ! spinup state as read from restart file, for determining whether to enter or exit spinup mode.
      real(r8)          :: totvegcthresh                   ! threshold for total vegetation carbon to zero out decomposition pools
@@ -105,8 +104,6 @@ contains
 
     allocate( this%decomp_cpools_col    (begc :endc,1:ndecomp_pools))   ; this%decomp_cpools_col    (:,:) = nan
     allocate( this%decomp_cpools_1m_col (begc :endc,1:ndecomp_pools))   ; this%decomp_cpools_1m_col (:,:) = nan
-
-    allocate( this%decomp_docpools_col  (begc :endc,1:ndecomp_pools))   ; this%decomp_docpools_col  (:,:) = nan
 
     allocate( this%ctrunc_vr_col(begc :endc,1:nlevdecomp_full)) ; 
     this%ctrunc_vr_col        (:,:) = nan
@@ -500,7 +497,6 @@ contains
              end if
              this%decomp_cpools_col(c,1:ndecomp_pools)    = decomp_cascade_con%initial_stock(1:ndecomp_pools)
              this%decomp_cpools_1m_col(c,1:ndecomp_pools) = decomp_cascade_con%initial_stock(1:ndecomp_pools)
-             this%decomp_docpools_col(c,1:ndecomp_pools)  = decomp_cascade_con%initial_stock(1:ndecomp_pools)
              if(use_soil_matrixcn)then
              end if
 
@@ -527,7 +523,6 @@ contains
              do k = 1, ndecomp_pools
                 this%decomp_cpools_col(c,k)    = c12_soilbiogeochem_carbonstate_inst%decomp_cpools_col(c,k) * ratio
                 this%decomp_cpools_1m_col(c,k) = c12_soilbiogeochem_carbonstate_inst%decomp_cpools_1m_col(c,k) * ratio
-                this%decomp_docpools_col(c,k)  = c12_soilbiogeochem_carbonstate_inst%decomp_docpools_col(c,k) * ratio
                 if(use_soil_matrixcn)then
                 end if
              end do
@@ -913,7 +908,6 @@ contains
        do fc = 1,num_allc
           c = filter_allc(fc)
           this%decomp_cpools_col(c,l) = 0._r8
-          this%decomp_docpools_col(c,l) = 0._r8
           if(use_soil_matrixcn)then
           end if
        end do
@@ -925,9 +919,6 @@ contains
              this%decomp_cpools_col(c,l) = &
                   this%decomp_cpools_col(c,l) + &
                   this%decomp_cpools_vr_col(c,j,l) * dzsoi_decomp(j)
-             this%decomp_docpools_col(c,l) = &
-                  this%decomp_docpools_col(c,l) + &
-                  this%decomp_docpools_vr_col(c,j,l) * dzsoi_decomp(j)
              if(use_soil_matrixcn)then
              end if
           end do
@@ -1098,15 +1089,15 @@ contains
     end do
 
     ! total dissolved organic carbon (TOTDOC)
-     do fc = 1,num_allc
+    do fc = 1,num_allc
        c = filter_allc(fc)
        this%totdoc_col(c) = 0._r8
-     end do
-     do l = 1, ndecomp_pools
-       if ( decomp_cascade_con%is_soil(l) ) then
+    end do
+    do l = 1, ndecomp_pools
+       if ( decomp_cascade_con%is_doc(l) ) then          
           do fc = 1,num_allc
              c = filter_allc(fc)
-             this%totdoc_col(c) = this%totdoc_col(c) + this%decomp_docpools_col(c,l)
+             this%totdoc_col(c) = this%totdoc_col(c) + this%decomp_cpools_col(c,l)
           end do
        end if
     end do

@@ -10,7 +10,7 @@ module SoilBiogeochemDecompCascadeBGCMod
   use shr_const_mod                      , only : SHR_CONST_TKFRZ
   use shr_log_mod                        , only : errMsg => shr_log_errMsg
   use clm_varpar                         , only : nlevdecomp, ndecomp_pools_max
-  use clm_varpar                         , only : i_litr_min, i_litr_max, i_met_lit, i_cwd, i_cwdl2
+  use clm_varpar                         , only : i_litr_min, i_litr_max, i_met_lit, i_cwd, i_cwdl2, i_doc_l, i_doc_r
   use clm_varctl                         , only : iulog, spinup_state, anoxia, use_lch4, use_fates
   use clm_varcon                         , only : zsoi
   use decompMod                          , only : bounds_type
@@ -328,6 +328,7 @@ contains
          is_metabolic                   => decomp_cascade_con%is_metabolic                       , & ! Output: [logical           (:)     ]  TRUE => pool is metabolic material                        
          is_cellulose                   => decomp_cascade_con%is_cellulose                       , & ! Output: [logical           (:)     ]  TRUE => pool is cellulose                                 
          is_lignin                      => decomp_cascade_con%is_lignin                          , & ! Output: [logical           (:)     ]  TRUE => pool is lignin                                    
+         is_doc                         => decomp_cascade_con%is_doc                             , & ! Output: [logical           (:)     ]  TRUE => pool is DOC
          spinup_factor                  => decomp_cascade_con%spinup_factor                        & ! Output: [real(r8)          (:)     ]  factor for AD spinup associated with each pool           
 
          )
@@ -406,6 +407,7 @@ contains
       is_metabolic(i_met_lit) = .true.
       is_cellulose(i_met_lit) = .false.
       is_lignin(i_met_lit) = .false.
+      is_doc(i_met_lit) = .false.
 
       i_cel_lit = i_met_lit + 1
       floating_cn_ratio_decomp_pools(i_cel_lit) = .true.
@@ -421,6 +423,7 @@ contains
       is_metabolic(i_cel_lit) = .false.
       is_cellulose(i_cel_lit) = .true.
       is_lignin(i_cel_lit) = .false.
+      is_doc(i_cel_lit) = .false.
 
       i_lig_lit = i_cel_lit + 1
       floating_cn_ratio_decomp_pools(i_lig_lit) = .true.
@@ -436,6 +439,7 @@ contains
       is_metabolic(i_lig_lit) = .false.
       is_cellulose(i_lig_lit) = .false.
       is_lignin(i_lig_lit) = .true.
+      is_doc(i_lig_lit) = .false.
 
       i_litr_max = i_lig_lit
       if (i_litr_min /= 1 .or. i_litr_max < 2 .or. i_litr_max > 3) then
@@ -461,6 +465,7 @@ contains
       is_metabolic(i_act_som) = .false.
       is_cellulose(i_act_som) = .false.
       is_lignin(i_act_som) = .false.
+      is_doc(i_act_som) = .false.
 
       i_slo_som = i_act_som + 1
       floating_cn_ratio_decomp_pools(i_slo_som) = .false.
@@ -476,6 +481,7 @@ contains
       is_metabolic(i_slo_som) = .false.
       is_cellulose(i_slo_som) = .false.
       is_lignin(i_slo_som) = .false.
+      is_doc(i_slo_som) = .false.
 
       i_pas_som = i_slo_som + 1
       floating_cn_ratio_decomp_pools(i_pas_som) = .false.
@@ -491,6 +497,7 @@ contains
       is_metabolic(i_pas_som) = .false.
       is_cellulose(i_pas_som) = .false.
       is_lignin(i_pas_som) = .false.
+      is_doc(i_pas_som) = .false.
 
       if (.not. use_fates) then
          ! CWD
@@ -508,7 +515,45 @@ contains
          is_metabolic(i_cwd) = .false.
          is_cellulose(i_cwd) = .false.
          is_lignin(i_cwd) = .false.
+         is_doc(i_cwd) = .false.
       endif
+
+      ! TODO should this go before the previous section so we don't have to check for use_fate?
+      if (.not. use_fates) then
+         i_doc_l = i_cwd + 1
+      else
+         i_doc_l = i_pas_som + 1
+      endif
+      floating_cn_ratio_decomp_pools(i_doc_l) = .false.
+      decomp_cascade_con%decomp_pool_name_restart(i_doc_l) = 'doc_labi'
+      decomp_cascade_con%decomp_pool_name_history(i_doc_l) = 'DOC_LABI'
+      decomp_cascade_con%decomp_pool_name_long(i_doc_l) = 'labile dissolved organic carbon'
+      decomp_cascade_con%decomp_pool_name_short(i_doc_l) = 'DL'
+      is_litter(i_doc_l) = .false.
+      is_soil(i_doc_l) = .false.
+      is_cwd(i_doc_l) = .false.
+      initial_cn_ratio(i_doc_l) = 90_r8
+      initial_stock(i_doc_l) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      is_metabolic(i_doc_l) = .false.
+      is_cellulose(i_doc_l) = .false.
+      is_lignin(i_doc_l) = .false.
+      is_doc(i_doc_l) = .true.
+
+      i_doc_r = i_doc_l + 1
+      floating_cn_ratio_decomp_pools(i_doc_r) = .false.
+      decomp_cascade_con%decomp_pool_name_restart(i_doc_r) = 'doc_rec'
+      decomp_cascade_con%decomp_pool_name_history(i_doc_r) = 'DOC_REC'
+      decomp_cascade_con%decomp_pool_name_long(i_doc_r) = 'Recalcitrant dissolved organic carbon'
+      decomp_cascade_con%decomp_pool_name_short(i_doc_r) = 'DR'
+      is_litter(i_doc_r) = .false.
+      is_soil(i_doc_r) = .false.
+      is_cwd(i_doc_r) = .false.
+      initial_cn_ratio(i_doc_r) = 90_r8
+      initial_stock(i_doc_r) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      is_metabolic(i_doc_r) = .false.
+      is_cellulose(i_doc_r) = .false.
+      is_lignin(i_doc_r) = .false.
+      is_doc(i_doc_r) = .true.
 
       speedup_fac = 1._r8
 

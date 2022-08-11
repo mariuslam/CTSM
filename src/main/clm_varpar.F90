@@ -86,6 +86,8 @@ module clm_varpar
   integer, public            :: i_oli_mic     = -9    ! index of oligotrophic microbial pool; overwritten in SoilBiogeochemDecompCascade*Mod
   integer, public            :: i_cwd         = -9    ! index of cwd pool; overwritten in SoilBiogeochemDecompCascade*Mod
   integer, public            :: i_cwdl2       = -9    ! index of cwd to l2 transition; overwritten in SoilBiogeochemDecompCascade*Mod
+  integer, public            :: i_doc_l       = -9    ! index of doc labile pool; overwritten in SoilBiogeochemDecompCascade*Mod
+  integer, public            :: i_doc_r       = -9    ! index of doc recalcitrant pool; overwritten in SoilBiogeochemDecompCascade*Mod
 
   integer, public :: ndecomp_pools_max
   integer, public :: ndecomp_pools

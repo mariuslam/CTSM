@@ -39,7 +39,7 @@ module SoilBiogeochemStateType
      real(r8) , pointer :: som_adv_coef_col            (:,:)   ! (m2/s) SOM advective flux 
      real(r8) , pointer :: som_diffus_coef_col         (:,:)   ! (m2/s) SOM diffusivity due to bio/cryo-turbation 
      real(r8) , pointer :: plant_ndemand_col           (:)     ! column-level plant N demand
-     real(r8), pointer :: docf_decomp_cascade_col      (:,:,:) ! (frac) doc fraction in decomposition step 
+     real(r8) , pointer :: docf_decomp_cascade_col     (:,:,:) ! (frac) doc fraction in decomposition step 
 
    contains
 
