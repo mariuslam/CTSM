@@ -156,6 +156,7 @@ contains
     end if
 
     ndecomp_pools = ndecomp_pools + 2 ! Add 2 extra pools for DOC
+    ndecomp_pools_max = ndecomp_pools_max + 2 ! Add 2 extra pools for DOC
 
     ! Set ndecomp_pools_vr needed for Matrix solution
 

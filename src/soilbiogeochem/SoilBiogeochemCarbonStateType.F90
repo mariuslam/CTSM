@@ -987,7 +987,7 @@ contains
           end do
        end do
        do l = 1, ndecomp_pools
-          if ( decomp_cascade_con%is_soil(l) ) then
+          if ( decomp_cascade_con%is_doc(l) ) then
              do j = 1, nlevdecomp
                 do fc = 1,num_allc
                    c = filter_allc(fc)
