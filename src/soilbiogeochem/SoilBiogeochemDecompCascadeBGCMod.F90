@@ -533,7 +533,7 @@ contains
       is_soil(i_doc_l) = .false.
       is_cwd(i_doc_l) = .false.
       initial_cn_ratio(i_doc_l) = 90_r8
-      initial_stock(i_doc_l) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      initial_stock(i_doc_l) = 20 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
       is_metabolic(i_doc_l) = .false.
       is_cellulose(i_doc_l) = .false.
       is_lignin(i_doc_l) = .false.
@@ -549,7 +549,7 @@ contains
       is_soil(i_doc_r) = .false.
       is_cwd(i_doc_r) = .false.
       initial_cn_ratio(i_doc_r) = 90_r8
-      initial_stock(i_doc_r) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      initial_stock(i_doc_r) = 10 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
       is_metabolic(i_doc_r) = .false.
       is_cellulose(i_doc_r) = .false.
       is_lignin(i_doc_r) = .false.
@@ -580,20 +580,20 @@ contains
       !----------------  list of transitions and their time-independent coefficients  ---------------!
       i_l1s1 = 1
       decomp_cascade_con%cascade_step_name(i_l1s1) = 'L1S1'
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l1s1) = 0.000143_r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l1s1) = rf_l1s1
       cascade_donor_pool(i_l1s1) = i_met_lit
       cascade_receiver_pool(i_l1s1) = i_act_som
 
       i_l2s1 = 2
       decomp_cascade_con%cascade_step_name(i_l2s1) = 'L2S1'
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l2s1) = 0.00007143_r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l2s1) = rf_l2s1
       cascade_donor_pool(i_l2s1) = i_cel_lit
       cascade_receiver_pool(i_l2s1) = i_act_som
 
       i_l3s2 = 3
       decomp_cascade_con%cascade_step_name(i_l3s2) = 'L3S2'
       ! TODO check [kaveh] Why is this set to 0?
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l3s2) = 0.00_r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_l3s2) = rf_l3s2
       cascade_donor_pool(i_l3s2) = i_lig_lit
       cascade_receiver_pool(i_l3s2) = i_slo_som
 
@@ -612,21 +612,21 @@ contains
       i_s2s1 = 6
       decomp_cascade_con%cascade_step_name(i_s2s1) = 'S2S1'
       ! TODO check [kaveh] Why is this set to 0?
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s1) = 0._r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s1) = rf_s2s1
       cascade_donor_pool(i_s2s1) = i_slo_som
       cascade_receiver_pool(i_s2s1) = i_act_som
 
       i_s2s3 = 7 
       decomp_cascade_con%cascade_step_name(i_s2s3) = 'S2S3'
       ! TODO check [kaveh] Why is this set to 0?
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s3) = 0._r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s2s3) = rf_s2s3
       cascade_donor_pool(i_s2s3) = i_slo_som
       cascade_receiver_pool(i_s2s3) = i_pas_som
 
       i_s3s1 = 8
       decomp_cascade_con%cascade_step_name(i_s3s1) = 'S3S1'
       ! TODO check [kaveh] Why is this set to 0?
-      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s3s1) = 0._r8
+      docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_s3s1) = rf_s3s1
       cascade_donor_pool(i_s3s1) = i_pas_som
       cascade_receiver_pool(i_s3s1) = i_act_som
 
@@ -634,14 +634,14 @@ contains
          i_cwdl2 = 9
          decomp_cascade_con%cascade_step_name(i_cwdl2) = 'CWDL2'
          ! TODO check [kaveh] Why is this set to 0?
-         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl2) = 0._r8
+         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl2) = docf_cwdl2
          cascade_donor_pool(i_cwdl2) = i_cwd
          cascade_receiver_pool(i_cwdl2) = i_cel_lit
          
          i_cwdl3 = 10
          decomp_cascade_con%cascade_step_name(i_cwdl3) = 'CWDL3'
          ! TODO check [kaveh] Why is this set to 0?
-         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl3) = 0._r8
+         docf_decomp_cascade(bounds%begc:bounds%endc,1:nlevdecomp,i_cwdl3) = docf_cwdl3
          cascade_donor_pool(i_cwdl3) = i_cwd
          cascade_receiver_pool(i_cwdl3) = i_lig_lit
       end if
