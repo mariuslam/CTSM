@@ -533,7 +533,7 @@ contains
       is_soil(i_doc_l) = .false.
       is_cwd(i_doc_l) = .false.
       initial_cn_ratio(i_doc_l) = 90_r8
-      initial_stock(i_doc_l) = 20 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      initial_stock(i_doc_l) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
       is_metabolic(i_doc_l) = .false.
       is_cellulose(i_doc_l) = .false.
       is_lignin(i_doc_l) = .false.
@@ -549,7 +549,7 @@ contains
       is_soil(i_doc_r) = .false.
       is_cwd(i_doc_r) = .false.
       initial_cn_ratio(i_doc_r) = 90_r8
-      initial_stock(i_doc_r) = 10 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
+      initial_stock(i_doc_r) = 0 ! TODO: params_inst%bgc_initial_Cstocks(i_pas_som)
       is_metabolic(i_doc_r) = .false.
       is_cellulose(i_doc_r) = .false.
       is_lignin(i_doc_r) = .false.
