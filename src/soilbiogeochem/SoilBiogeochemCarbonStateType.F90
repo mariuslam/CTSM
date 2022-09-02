@@ -1094,7 +1094,7 @@ contains
        this%totdoc_col(c) = 0._r8
     end do
     do l = 1, ndecomp_pools
-       if ( decomp_cascade_con%is_doc(l) ) then          
+       if ( decomp_cascade_con%is_doc(l) ) then
           do fc = 1,num_allc
              c = filter_allc(fc)
              this%totdoc_col(c) = this%totdoc_col(c) + this%decomp_cpools_col(c,l)

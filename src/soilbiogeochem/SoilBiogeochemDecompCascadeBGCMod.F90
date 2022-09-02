@@ -383,10 +383,13 @@ contains
             rf_s1s2(c,j) = t
             rf_s1s3(c,j) = t
             ! TODO check [kaveh] why do we start with 0?
-            docf_s1s2(c,j) = 0.0_r8
-            docf_s1s3(c,j) = 0.0_r8
-            docf_s1s2(c,1) = 0.0007143_r8
-            docf_s1s3(c,1) = 0.000143_r8
+            if (j == 1) then
+               docf_s1s2(c,j) = 0.0007143_r8
+               docf_s1s3(c,j) = 0.000143_r8
+            else
+               docf_s1s2(c,j) = 0._r8
+               docf_s1s3(c,j) = 0._r8
+            end if
          end do
       end do
       initial_stock_soildepth = params_inst%bgc_initial_Cstocks_depth
