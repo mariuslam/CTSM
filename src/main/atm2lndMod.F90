@@ -285,8 +285,7 @@ contains
                c2=lun%colf(l)
                dztile2 = (initdztile2(g) + exice_subs_tot_acc(c2) + snow_depth(c2)) - &
                          (exice_subs_tot_acc(c1) + snow_depth(c1))! get the difference between the top of the snow on tiles
-               if (dztile2 >  SnowDepthTreshold) &
-                  > SnowDepthTreshold) then
+               if (dztile2 >  SnowDepthTreshold) then
                   !Scale snow forcing. For now assumes equal sizes of the two tiles
                   forc_snow_c(c1) = 0.0_r8
                   forc_snow_c(c2) = forc_snow_c(c2) * 2.0_r8
