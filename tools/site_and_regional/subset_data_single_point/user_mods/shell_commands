@@ -1,0 +1,10 @@
+
+# Change below line if you move the subset data directory
+
+./xmlchange CLM_USRDAT_DIR=/cluster/home/marlam/CTSM_TILES/tools/site_and_regional/subset_data_single_point
+
+./xmlchange PTS_LON=126.483
+
+./xmlchange PTS_LAT=72.366
+
+./xmlchange MPILIB=mpi-serial
