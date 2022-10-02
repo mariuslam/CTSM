@@ -116,9 +116,9 @@ contains
     use clm_varcon               , only : rair, cpair, grav, denice
     use clm_varpar               , only : nlevgrnd
     use QsatMod                  , only : Qsat
-    use ColumnType      , only : col
-    use LandunitType    , only : lun
-    use GridcellType    , only : grc
+    use ColumnType               , only : col
+    use LandunitType             , only : lun
+    use GridcellType             , only : grc
     use WaterStateBulkType       , only : waterstatebulk_type
     use WaterDiagnosticBulkType  , only : waterdiagnosticbulk_type
     use clm_varctl               , only : use_excess_ice_tiles

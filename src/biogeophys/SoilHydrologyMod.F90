@@ -1647,31 +1647,33 @@ contains
 !#4
    !-----------------------------------------------------------------------
    subroutine PerchedLateralFlow(bounds, num_hydrologyc, filter_hydrologyc, &
-        num_urbanc, filter_urbanc, soilhydrology_inst, soilstate_inst, &
-        waterstatebulk_inst, waterfluxbulk_inst)
+        soilhydrology_inst, soilstate_inst, &
+        waterstatebulk_inst, waterfluxbulk_inst,  waterdiagnosticbulk_inst) ! KSA
      !
      ! !DESCRIPTION:
      ! Calculate subsurface drainage from perched saturated zone
      !
      ! !USES:
-     use clm_varcon       , only : pondmx, tfrz, watmin,rpi, secspday, nlvic
-     use column_varcon    , only : icol_roof, icol_road_imperv, icol_road_perv
+     use clm_varcon       , only : rpi
+     use LandunitType     , only : lun         !KSA     
+     use ColumnType       , only : col         !KSA
+     use landunit_varcon  , only : istsoil     !KSA
 
      !
      ! !ARGUMENTS:
      type(bounds_type)        , intent(in)    :: bounds               
      integer                  , intent(in)    :: num_hydrologyc       ! number of column soil points in column filter
-     integer                  , intent(in)    :: num_urbanc           ! number of column urban points in column filter
-     integer                  , intent(in)    :: filter_urbanc(:)     ! column filter for urban points
      integer                  , intent(in)    :: filter_hydrologyc(:) ! column filter for soil points
      type(soilstate_type)     , intent(in)    :: soilstate_inst
      type(soilhydrology_type) , intent(inout) :: soilhydrology_inst
      type(waterstatebulk_type)    , intent(inout) :: waterstatebulk_inst
      type(waterfluxbulk_type)     , intent(inout) :: waterfluxbulk_inst
+     type(waterdiagnosticbulk_type) ,  intent(inout) :: waterdiagnosticbulk_inst !KSA
      !
      ! !LOCAL VARIABLES:
      character(len=32) :: subname = 'PerchedLateralFlow' ! subroutine name
-     integer  :: c,j,fc,i                                ! indices
+     integer  :: c,j,fc,i,c1,c2,g, c_src,c_dst           ! indices    KSA
+     real(r8) :: A1, A2                    ! Areas of representative permafrost tiles [m] KSA
      real(r8) :: dtime                                   ! land model time step (sec)
      real(r8) :: wtsub                                   ! summation of hk*dzmm for layers below water table (mm**2/s)
      real(r8) :: h2osoi_vol
@@ -1685,6 +1687,12 @@ contains
      real(r8) :: s1, s2, m, b
      real(r8) :: q_perch
      real(r8) :: q_perch_max
+     real(r8) :: initdztile2(bounds%begg:bounds%endg) ! Initial elevation difference between top of tile 2 compared to tile 1 KSA 
+     real(r8) :: dztile2                              ! Elevation difference between top of tile 2 compared to tile 1 KSA
+     real(r8) :: dx,dl                                ! tile geometry parameters  [m] KSA
+     real(r8) :: transmis                             ! transmissivity (m2/s) KSA
+     real(r8) :: head_gradient                        ! head gradient (m/m)  KSA
+     real(r8) :: diff                                 ! diff is what must be added to the source to make it equal to the destination depth  KSA
      !-----------------------------------------------------------------------
 
      associate(                                                            & 
@@ -1704,9 +1712,16 @@ contains
           qflx_drain_perched =>    waterfluxbulk_inst%qflx_drain_perched_col , & ! Output: [real(r8) (:)   ] perched wt sub-surface runoff (mm H2O /s)         
 
           h2osoi_liq         =>    waterstatebulk_inst%h2osoi_liq_col        , & ! Output: [real(r8) (:,:) ] liquid water (kg/m2)                            
-          h2osoi_ice         =>    waterstatebulk_inst%h2osoi_ice_col          & ! Output: [real(r8) (:,:) ] ice lens (kg/m2)                                
+          h2osoi_ice         =>    waterstatebulk_inst%h2osoi_ice_col          & ! Output: [real(r8) (:,:) ] ice lens (kg/m2)       
+                                   
+          exice_subs_tot_acc =>    waterdiagnosticbulk_inst%exice_subs_tot_acc  & ! Input: [real(r8) (:) ]  subsidence due to excess ice melt (m)   KSA
           )
-
+          
+       initdztile2(bounds%begg:bounds%endg) = 0.5_r8 ! Will be read from file  KSA
+       dx = 2.0_r8   ! Will be read from file        ! KSA
+       dl = 10.0_r8  ! Will be read from file        ! KSA
+       A1 = 10.0_r8  ! Will be read from file        ! KSA
+       A2 = 10.0_r8  ! Will be read from file        ! KSA
        ! Get time step
 
        dtime = get_step_size_real()
@@ -1734,24 +1749,66 @@ contains
        ! compute drainage from perched saturated region
        do fc = 1, num_hydrologyc
           c = filter_hydrologyc(fc)
-
+          
           qflx_drain_perched(c) = 0._r8
           if (frost_table(c) > zwt_perched(c)) then
+         !-------------------------------------------------------------------KSA
+             l = col%landunit(c)               
+             g = col%gridcell(c)                
+	     if (lun%ncolumns(l) == 2) then     
+                c1=lun%coli(l)                  
+	        c2=lun%colf(l)                
+	        dztile2 = (initdztile2(g) + exice_subs_tot_acc(c2)) - exice_subs_tot_acc(c1) 
+                
+                ! Calculate head gradient: is the water table height difference divided by the distance between tiles--> deltaH/deltaX KSA
+                head_gradient = (zwt_perched(c1)-(zwt_perched(c2)+dztile2)) / dx
 
-             ! specify maximum drainage rate
-             q_perch_max = params_inst%perched_baseflow_scalar &
-                  * sin(col%topo_slope(c) * (rpi/180._r8))
+                ! Calculate transmisivity = overlapping height of the highest perched water table 
+                transmis = 0._r8
+                ! if head gradient is positive--> water table of c1 is deeper and c2 is src, if negative--> water table in c2 is deeper
+                if (head_gradient>=0._r8) then
+                   c_dst=c1
+                   c_src=c2
+                   diff=-dztile2    !diff is what must be added to the source to make it equal to the destination depth
+                else
+                   c_dst=c2
+                   c_src=c1
+                   diff=dztile2
+                endif
+                ! if k_perch equals k_frost, no perched saturated zone exists in the source tile
+                if(k_perch(c_src) < k_frost(c_src)) then
+                   do k = k_perch(c_src), k_frost(c_src)-1
+                      if(k == k_perch(c_src)) then !we must take the right depth of the layer k, maybe table is not the whole layer thickness
+                         transmis = transmis + 1.e-3_r8*hksat(c_src,k)*(zi(c_src,k) - zwt_perched(c_src))
+                      else
+                         if (z(c_src,k)+diff < frost_table(c_dst)) then !the source depth must be smaller than the frost table depth of the destination 
+                            transmis = transmis + 1.e-3_r8*hksat(c_src,k)*dz(c_src,k)
+                         endif
+                      endif
+                   enddo
+                endif
+                if c=c_dst
+                   qflx_drain_perched(c)=-abs(1.e3_r8*(transmis*dl*head_gradient/10._r8)) !10 must be replaced by area of c_dst
+                else
+                   qflx_drain_perched(c)=abs(1.e3_r8*(transmis*dl*head_gradient/10._r8)) !10 must be replaced by area of c_src
+             else
+          !------------------------------------------------------------------KSA
+                ! specify maximum drainage rate
+                q_perch_max = params_inst%perched_baseflow_scalar &
+                     * sin(col%topo_slope(c) * (rpi/180._r8))
 
-             wtsub = 0._r8
-             q_perch = 0._r8
-             do k = k_perch(c), k_frost(c)-1
-                q_perch = q_perch + hksat(c,k)*dz(c,k)
-                wtsub = wtsub + dz(c,k)
-             end do
-             if (wtsub > 0._r8) q_perch = q_perch/wtsub
+                wtsub = 0._r8
+                q_perch = 0._r8
+                do k = k_perch(c), k_frost(c)-1
+                   q_perch = q_perch + hksat(c,k)*dz(c,k)
+                   wtsub = wtsub + dz(c,k)
+                end do
+                if (wtsub > 0._r8) q_perch = q_perch/wtsub
 
-             qflx_drain_perched(c) = q_perch_max * q_perch &
-                  *(frost_table(c) - zwt_perched(c))
+                qflx_drain_perched(c) = q_perch_max * q_perch &
+                     *(frost_table(c) - zwt_perched(c))
+             endif     
+             
           endif
        enddo
              
