@@ -3053,7 +3053,7 @@ end subroutine SetMatrix_Snow
          tl1zbot = 0.0_r8
          tl2zbot = 0.0_r8
          
-         write(iulog,*) 'LateralHeatFlux'
+         !write(iulog,*) 'LateralHeatFlux'
 
          do j = 2,nlevmaxurbgrnd*2 !could instead use while (j1<=nsoil .and. j2<=nsoil), j here is eaqual to j1+j2
             
@@ -3117,8 +3117,8 @@ end subroutine SetMatrix_Snow
    
    write(iulog,*) ' t_soisno(c1,:)= ', t_soisno(c1,:)
    write(iulog,*) ' t_soisno(c2,:)= ', t_soisno(c2,:)
-   write(iulog,*) ' hhf1= ', hhf1
-   write(iulog,*) ' hhf2= ', hhf2
+   write(iulog,*) ' hhf1= ', hhf1,'eflx_lateral_col(c1)',eflx_lateral_col(c1)
+   write(iulog,*) ' hhf2= ', hhf2,'eflx_lateral_col(c2)',eflx_lateral_col(c2)
 
    end associate 
 
