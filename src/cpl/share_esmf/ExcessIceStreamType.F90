@@ -223,10 +223,12 @@ contains
       do g = bounds%begg,bounds%endg
           l = grc%landunit_indices(istsoil,g)
           if (lun%ncolumns(l) == 2) then
+            this%exice_bulk(g)=0.25_r8 !Added for single site of Samoylov
             c=lun%coli(l)
             exice_bulk_init(c)=this%exice_bulk(g)*1.7_r8 ! Will be read from the file
             c=lun%colf(l)
             exice_bulk_init(c)=this%exice_bulk(g)*0.3_r8 ! Will be read from the file
+            !write(iulog,*) 'exice_bulk_init(c)',exice_bulk_init(c)
             !call endrun(msg=' CONDITION WORKS '//errMsg(sourcefile, __LINE__))
           endif
       enddo
