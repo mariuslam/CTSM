@@ -1751,7 +1751,7 @@ contains
           c = filter_hydrologyc(fc)
           
           qflx_drain_perched(c) = 0._r8
-          write(iulog,*) "c",c,frost_table(c),zwt_perched(c)
+          !write(iulog,*) "c",c,frost_table(c),zwt_perched(c)
           if (frost_table(c) > zwt_perched(c)) then
          !-------------------------------------------------------------------KSA
              l = col%landunit(c)               
@@ -1793,7 +1793,8 @@ contains
                 else
                    qflx_drain_perched(c)=abs(1.e3_r8*(transmis*dl*head_gradient/10._r8)) !10 must be replaced by area of c_src
                 endif
-                write(iulog,*) "c",c,"c1",c1,"c2",c2,"dztile2",dztile2,"head_gradient",head_gradient,"transmis",transmis
+                !write(iulog,*) "c",c,"c1",c1,"c2",c2,"dztile2",dztile2,"head_gradient",head_gradient,"transmis",transmis
+                !write(iulog,*) "qflx_drain_perched(c)",qflx_drain_perched(c)
              else
           !------------------------------------------------------------------KSA
                 ! specify maximum drainage rate

@@ -3033,9 +3033,6 @@ end subroutine SetMatrix_Snow
    A2 = 10.0_r8  ! Will be read from file
 
    dztile2 = 0.0_r8 !
-   hhf_interface = 0.0_r8
-   hhf1(1:nlevmaxurbgrnd) = 0.0_r8
-   hhf2(1:nlevmaxurbgrnd) = 0.0_r8
 
    do g = bounds%begg,bounds%endg
       l = grc%landunit_indices(istsoil,g)            
@@ -3052,9 +3049,10 @@ end subroutine SetMatrix_Snow
          tl2ztop = 0.0_r8
          tl1zbot = 0.0_r8
          tl2zbot = 0.0_r8
-         
-         !write(iulog,*) 'LateralHeatFlux'
-
+         hhf_interface = 0.0_r8
+         hhf1(1:nlevmaxurbgrnd) = 0.0_r8
+         hhf2(1:nlevmaxurbgrnd) = 0.0_r8
+         !write(iulog,*) 'before',hhf1(18)
          do j = 2,nlevmaxurbgrnd*2 !could instead use while (j1<=nsoil .and. j2<=nsoil), j here is eaqual to j1+j2
             
             !Update tile top and bottom depth. Using top of tile1 as the reference. 
@@ -3072,18 +3070,14 @@ end subroutine SetMatrix_Snow
             thk_int = (thk(c1,j1)*thk(c2,j2))/(thk(c1,j1)+thk(c2,j2)) 
             
             !calculate horizontal heat flux through interface (from tile2 to tile1)
-            hhf_interface = - thk_int * (t_soisno(c2,j2) - t_soisno(c1,j1)) / dx 
-
+            hhf_interface = thk_int * (t_soisno(c2,j2) - t_soisno(c1,j1)) / dx 
+ 
             !Scale flux to tile area and add to flux arrays
             hhf1(j1) = hhf1(j1) + hhf_interface * dzhhf * dl / A1
-            hhf2(j2) = hhf2(j2) - hhf_interface * dzhhf * dl / A2 
-            
-            !For testing
-            write(iulog,*) ' j1= ', j1, ' j2= ', j2
-            write(iulog,*) 'tl1ztop...', tl1ztop,tl1zbot,tl2ztop,tl2zbot
-            write(iulog,*) ' dzhhf = ', dzhhf, ' hhf_interface= ', hhf_interface, 't_soisno(c1,j1)',t_soisno(c1,j1), &
-            't_soisno(c2,j2)= ',t_soisno(c2,j2)
-
+            hhf2(j2) = hhf2(j2) - hhf_interface * dzhhf * dl / A2
+            if (j1==18) then
+               write(iulog,*) 'middle_18',hhf_interface,'temp_diff',t_soisno(c2,j2) - t_soisno(c1,j1)
+            endif
             !update index
             if (tl1zbot < tl2zbot) then 
                j1=j1+1
@@ -3099,9 +3093,8 @@ end subroutine SetMatrix_Snow
                endif
             endif
          enddo !layer loop
-
+         !write(iulog,*) 'after',hhf1(18)
       endif
-   
 
       eflx_lateral_col(c1) = 0.0_r8
       eflx_lateral_col(c2) = 0.0_r8      
@@ -3114,11 +3107,6 @@ end subroutine SetMatrix_Snow
       enddo
    ! Output lateral heat flux (per layer or pr column)
    enddo !grid cell loop
-   
-   write(iulog,*) ' t_soisno(c1,:)= ', t_soisno(c1,:)
-   write(iulog,*) ' t_soisno(c2,:)= ', t_soisno(c2,:)
-   write(iulog,*) ' hhf1= ', hhf1,'eflx_lateral_col(c1)',eflx_lateral_col(c1)
-   write(iulog,*) ' hhf2= ', hhf2,'eflx_lateral_col(c2)',eflx_lateral_col(c2)
 
    end associate 
 
