@@ -206,33 +206,34 @@ contains
    integer  :: begg, endg
    integer  :: c, l, l1, g !counters
    integer  :: gix, gix1    ! global index values
-   
+
+   call this%InitAllocate( bounds ) !added for single site
    exice_bulk_init(bounds%begc:bounds%endc)=0.0_r8
 
-   do c = bounds%begc,bounds%endc
-      g = col%gridcell(c)
-      l = col%landunit(c)
-      if (lun%itype(l) == istsoil .or. lun%itype(l) == istcrop) then
-            exice_bulk_init(c)=this%exice_bulk(g)
-         else 
-            exice_bulk_init(c) = 0.0_r8
-         endif
-   enddo
-   
    if (use_excess_ice_tiles) then
       do g = bounds%begg,bounds%endg
           l = grc%landunit_indices(istsoil,g)
           if (lun%ncolumns(l) == 2) then
-            this%exice_bulk(g)=0.25_r8 !Added for single site of Samoylov
+            this%exice_bulk(g)=0.25_r8
             c=lun%coli(l)
-            exice_bulk_init(c)=this%exice_bulk(g)*1.7_r8 ! Will be read from the file
+            exice_bulk_init(c)=0.25_r8*1.7_r8   !this%exice_bulk(g)*1.7_r8 ! Will be read from the file
             c=lun%colf(l)
-            exice_bulk_init(c)=this%exice_bulk(g)*0.3_r8 ! Will be read from the file
-            !write(iulog,*) 'exice_bulk_init(c)',exice_bulk_init(c)
+            exice_bulk_init(c)=0.25_r8*0.3_r8   !this%exice_bulk(g)*0.3_r8 ! Will be read from the file
+            !write(iulog,*) 'exice_bulk_init(c)',exice_bulk_init(c) !to know what the excess ice is at samoylov
             !call endrun(msg=' CONDITION WORKS '//errMsg(sourcefile, __LINE__))
           endif
       enddo
-   endif
+   else
+      do c = bounds%begc,bounds%endc
+        g = col%gridcell(c)
+        l = col%landunit(c)
+        if (lun%itype(l) == istsoil .or. lun%itype(l) == istcrop) then
+            exice_bulk_init(c)=this%exice_bulk(g)
+        else 
+            exice_bulk_init(c) = 0.0_r8
+        endif
+      enddo
+    endif
 
 
 
