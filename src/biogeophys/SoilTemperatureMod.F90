@@ -3067,11 +3067,11 @@ end subroutine SetMatrix_Snow
                dzhhf = 0.0_r8
             end if               
             
-            thk_int = (thk(c1,j1)*thk(c2,j2))/(thk(c1,j1)+thk(c2,j2)) 
+            thk_int = (thk(c1,j1)*thk(c2,j2))/(thk(c1,j1)+thk(c2,j2))
             
             !calculate horizontal heat flux through interface (from tile2 to tile1)
-            hhf_interface = thk_int * (t_soisno(c2,j2) - t_soisno(c1,j1)) / dx 
- 
+            hhf_interface = thk_int * (t_soisno(c2,j2) - t_soisno(c1,j1)) / dx
+
             !Scale flux to tile area and add to flux arrays
             hhf1(j1) = hhf1(j1) + hhf_interface * dzhhf * dl / A1
             hhf2(j2) = hhf2(j2) - hhf_interface * dzhhf * dl / A2
@@ -3097,7 +3097,7 @@ end subroutine SetMatrix_Snow
 
       eflx_lateral_col(c1) = 0.0_r8
       eflx_lateral_col(c2) = 0.0_r8      
-   ! Update temperatures based on heat fluxes
+      ! Update temperatures based on heat fluxes
       do j = 1,nlevmaxurbgrnd
          t_soisno(c1,j) = t_soisno(c1,j) + hhf1(j) * dtime / cv(c1,j)
          t_soisno(c2,j) = t_soisno(c2,j) + hhf2(j) * dtime / cv(c2,j)
@@ -3105,8 +3105,8 @@ end subroutine SetMatrix_Snow
          eflx_lateral_col(c1) = eflx_lateral_col(c1) + hhf1(j)
          eflx_lateral_col(c2) = eflx_lateral_col(c2) + hhf2(j)
       enddo
-   ! Output lateral heat flux (per layer or pr column)
-   enddo !grid cell loop
+      !Output lateral heat flux (per layer or pr column)
+   enddo !grid cell loop         
    write(iulog,*) 'heat',eflx_lateral_col(c1),eflx_lateral_col(c2)
    end associate 
 
