@@ -290,7 +290,7 @@ contains
     ! !USES:
     use shr_infnan_mod , only : nan => shr_infnan_nan, assignment(=)
     use clm_varpar     , only : nlevsno, nlevgrnd
-    use clm_varctl     , only : use_cn, use_hydrstress
+    use clm_varctl     , only : use_cn, use_hydrstress, use_excess_ice_tiles
     use histFileMod    , only : hist_addfld1d, hist_addfld2d, no_snow_normal
     use ncdio_pio      , only : ncd_inqvdlen
     implicit none
@@ -612,6 +612,13 @@ contains
     call hist_addfld2d (fname='FGR_SOIL_R', units='watt/m^2', type2d='levgrnd', &
          avgflag='A', long_name='Rural downward heat flux at interface below each soil layer', &
          ptr_col=this%eflx_fgr_col, set_spec=spval, default='inactive')
+
+    if (use_excess_ice_tiles) then
+       this%eflx_lateral_col(begc:endc) = spval
+       call hist_addfld1d (fname='LAT_HEATFLUX', units='watt/m^2', &
+            avgflag='A', long_name='Lateral heat flux between two soil columns', &
+            ptr_col=this%eflx_lateral_col, set_spec=spval, default='active')
+    endif
 
     this%eflx_traffic_patch(begp:endp) = spval
     call hist_addfld1d (fname='TRAFFICFLUX', units='W/m^2',  &

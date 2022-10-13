@@ -3043,8 +3043,8 @@ end subroutine SetMatrix_Snow
          !Update elevation of tile2 relative to tile1
          dztile2 = initdztile2(g) + exice_subs_tot_acc(c2) - exice_subs_tot_acc(c1)                
 
-         j1=1
-         j2=1
+         j1=5
+         j2=5
          tl1ztop = 0.0_r8
          tl2ztop = 0.0_r8
          tl1zbot = 0.0_r8
@@ -3060,7 +3060,7 @@ end subroutine SetMatrix_Snow
             tl1zbot = zi(c1,j1) 
             tl2ztop = zi(c2,j2) - dz(c2,j2) + dztile2 !top of tile2 relative to tile1
             tl2zbot = zi(c2,j2) + dztile2    
-
+            !write(iulog,*) 'height_tiles',tl1ztop,tl2ztop,dztile2
             dzhhf = min(tl1zbot,tl2zbot)-max(tl1ztop,tl2ztop) !calculate thickness of overlaping part of layer j1 and j2
 
             if (dzhhf<0.0_r8) then !dzhhf will be negative if there is no interface, so flux should be zero. 
@@ -3101,13 +3101,13 @@ end subroutine SetMatrix_Snow
       do j = 1,nlevmaxurbgrnd
          t_soisno(c1,j) = t_soisno(c1,j) + hhf1(j) * dtime / cv(c1,j)
          t_soisno(c2,j) = t_soisno(c2,j) + hhf2(j) * dtime / cv(c2,j)
-         write(iulog,*) 'soilt',t_soisno(c1,j),t_soisno(c2,j)
+         !write(iulog,*) 'soilt',t_soisno(c1,j),t_soisno(c2,j)
          eflx_lateral_col(c1) = eflx_lateral_col(c1) + hhf1(j)
          eflx_lateral_col(c2) = eflx_lateral_col(c2) + hhf2(j)
       enddo
       !Output lateral heat flux (per layer or pr column)
    enddo !grid cell loop         
-   write(iulog,*) 'heat',eflx_lateral_col(c1),eflx_lateral_col(c2)
+   !write(iulog,*) 'heat',eflx_lateral_col(c1),eflx_lateral_col(c2)
    end associate 
 
   end subroutine LateralHeatFlux
