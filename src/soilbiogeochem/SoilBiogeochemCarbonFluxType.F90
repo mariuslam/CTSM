@@ -1094,7 +1094,7 @@ contains
                this%somhr_col(c)
           this%doc_col(c) = &
                this%Ldoc_col(c) + &
-               this%Rdoc_col(c) + &
+               this%Rdoc_col(c)
        
        end do
 

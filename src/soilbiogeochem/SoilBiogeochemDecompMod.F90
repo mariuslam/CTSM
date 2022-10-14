@@ -113,7 +113,7 @@ contains
 
          fpi_vr                           =>    soilbiogeochem_state_inst%fpi_vr_col                                  , & ! Input:  [real(r8) (:,:)   ]  fraction of potential immobilization (no units) 
          rf_decomp_cascade                =>    soilbiogeochem_carbonflux_inst%rf_decomp_cascade_col                  , & ! Input:  [real(r8) (:,:,:) ]  respired fraction in decomposition step (frac)
-         rf_decomp_cascade                =>    soilbiogeochem_carbonflux_inst%df_decomp_cascade_col                  , & ! Input:  [real(r8) (:,:,:) ]  doc fraction in decomposition step (frac)
+         df_decomp_cascade                =>    soilbiogeochem_carbonflux_inst%df_decomp_cascade_col                  , & ! Input:  [real(r8) (:,:,:) ]  doc fraction in decomposition step (frac)
 
          decomp_npools_vr                 =>    soilbiogeochem_nitrogenstate_inst%decomp_npools_vr_col                , & ! Input:  [real(r8) (:,:,:) ]  (gC/m3)  vertically-resolved decomposing (litter, cwd, soil) N pools
          decomp_cpools_vr                 =>    soilbiogeochem_carbonstate_inst%decomp_cpools_vr_col                  , & ! Input:  [real(r8) (:,:,:) ]  (gC/m3)  vertically-resolved decomposing (litter, cwd, soil) c pools
