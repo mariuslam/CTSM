@@ -244,7 +244,7 @@ contains
                   if (.not. use_soil_matrixcn) then
                      cf_soil%decomp_cpools_sourcesink_col(c,j,cascade_donor_pool(k)) = &
                        cf_soil%decomp_cpools_sourcesink_col(c,j,cascade_donor_pool(k)) &
-                       - ( cf_soil%decomp_cascade_hr_vr_col(c,j,k) + cf_soil%decomp_cascade_doc_vr_col(c,j,k) + cf_soil%decomp_cascade_ctransfer_vr_col(c,j,k)) *dt
+                       - ( cf_soil%decomp_cascade_hr_vr_col(c,j,k) + cf_soil%decomp_cascade_ctransfer_vr_col(c,j,k)) *dt
                   end if !not use_soil_matrixcn 
                end do
             end do
