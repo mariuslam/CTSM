@@ -347,7 +347,7 @@ contains
          do j = 1,nlevdecomp
             do fc = 1,num_soilc
                c = filter_soilc(fc)
-               phr_vr(c,j) = phr_vr(c,j) + rf_decomp_cascade(c,j,k) * (1 - df_decomp_cascade(c,j,k)) * p_decomp_cpool_loss(c,j,k)
+               phr_vr(c,j) = phr_vr(c,j) + rf_decomp_cascade(c,j,k) * p_decomp_cpool_loss(c,j,k)
             end do
          end do
       end do
