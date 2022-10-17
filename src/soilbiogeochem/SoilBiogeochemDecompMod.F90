@@ -75,6 +75,7 @@ contains
     !
     ! !USES:
     use SoilBiogeochemDecompCascadeConType, only : i_atm
+    use abortutils                        , only: endrun
     !
     ! !ARGUMENT:
     type(bounds_type)                       , intent(in)    :: bounds   
@@ -192,7 +193,7 @@ contains
                   if (rf_decomp_cascade(c,j,k)+df_decomp_cascade(c,j,k) >= 1._r8) then
                      write(iulog,*) 'Decomposition fractions too large: c:',c,'j',j,'k', &
                      k,'rf_decomp_cascade',rf_decomp_cascade(c,j,k),"rf_decomp_cascade",df_decomp_cascade(c,j,k)
-                     call endrun('ecomposition fractions too large')
+                     call endrun(msg='Decomposition fractions too large'//errMsg(sourcefile, __LINE__))
                   end if
                   decomp_cascade_hr_vr(c,j,k) = rf_decomp_cascade(c,j,k) * p_decomp_cpool_loss(c,j,k)
                   decomp_cascade_doc_vr(c,j,k) = df_decomp_cascade(c,j,k) * p_decomp_cpool_loss(c,j,k)
