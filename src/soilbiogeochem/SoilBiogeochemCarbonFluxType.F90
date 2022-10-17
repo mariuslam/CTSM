@@ -1078,7 +1078,7 @@ contains
          if ( is_soil(decomp_cascade_con%cascade_donor_pool(k)) ) then
             do fc = 1,num_soilc
                c = filter_soilc(fc)
-               this%rdoc_col(c) = this%Rroc_col(c) + this%decomp_cascade_doc_col(c,k)
+               this%rdoc_col(c) = this%rdoc_col(c) + this%decomp_cascade_doc_col(c,k)
             end do
          end if
       end do
