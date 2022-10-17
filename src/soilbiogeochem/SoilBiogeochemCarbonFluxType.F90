@@ -58,8 +58,8 @@ module SoilBiogeochemCarbonFluxType
 
      real(r8), pointer :: hr_col                                    (:)     ! (gC/m2/s) total heterotrophic respiration
      real(r8), pointer :: doc_col                                   (:)     ! (gC/m2/s) total DOC prduction
-     real(r8), pointer :: Ldoc_col                                  (:)     ! (gC/m2/s) Labile DOC: definition based on donor pool
-     real(r8), pointer :: Rdoc_col                                  (:)     ! (gC/m2/s) Recalcitrant DOC: definition based on donor pool
+     real(r8), pointer :: ldoc_col                                  (:)     ! (gC/m2/s) Labile DOC: definition based on donor pool
+     real(r8), pointer :: rdoc_col                                  (:)     ! (gC/m2/s) Recalcitrant DOC: definition based on donor pool
      real(r8), pointer :: michr_col                                 (:)     ! (gC/m2/s) microbial heterotrophic respiration: donor-pool based definition, so expect it to be zero with MIMICS; microbial decomposition is responsible for heterotrophic respiration of donor pools (litter and soil), but in the accounting we assign it to the donor pool for consistency with CENTURY
      real(r8), pointer :: cwdhr_col                                 (:)     ! (gC/m2/s) coarse woody debris heterotrophic respiration: donor-pool based definition
      real(r8), pointer :: lithr_col                                 (:)     ! (gC/m2/s) litter heterotrophic respiration: donor-pool based definition
@@ -175,8 +175,8 @@ contains
 
      allocate(this%hr_col                  (begc:endc)) ; this%hr_col                  (:) = nan
      allocate(this%doc_col                 (begc:endc)) ; this%doc_col                 (:) = nan
-     allocate(this%Ldoc_col                (begc:endc)) ; this%Ldoc_col                (:) = nan
-     allocate(this%Rdoc_col                (begc:endc)) ; this%Rdoc_col                (:) = nan
+     allocate(this%ldoc_col                (begc:endc)) ; this%ldoc_col                (:) = nan
+     allocate(this%rdoc_col                (begc:endc)) ; this%rdoc_col                (:) = nan
      allocate(this%michr_col               (begc:endc)) ; this%michr_col               (:) = nan
      allocate(this%cwdhr_col               (begc:endc)) ; this%cwdhr_col               (:) = nan
      allocate(this%lithr_col               (begc:endc)) ; this%lithr_col               (:) = nan
@@ -262,15 +262,15 @@ contains
              avgflag='A', long_name='total DOC production', &
              ptr_col=this%doc_col)
 
-        this%Ldoc_col(begc:endc) = spval
+        this%ldoc_col(begc:endc) = spval
         call hist_addfld1d (fname='LAB_DOC', units='gC/m^2/s', &
              avgflag='A', long_name='Labile DOC production', &
-             ptr_col=this%Ldoc_col)
+             ptr_col=this%ldoc_col)
 
-        this%Rdoc_col(begc:endc) = spval
+        this%rdoc_col(begc:endc) = spval
         call hist_addfld1d (fname='REC_DOC', units='gC/m^2/s', &
              avgflag='A', long_name='Recalcitrant DOC production', &
-             ptr_col=this%Rdoc_col)
+             ptr_col=this%rdoc_col)
 
         if (decomp_method == mimics_decomp) then
            this%michr_col(begc:endc) = spval
@@ -889,8 +889,8 @@ contains
        i = filter_column(fi)
        this%hr_col(i)            = value_column
        this%doc_col(i)           = value_column
-       this%Ldoc_col(i)          = value_column
-       this%Rdoc_col(i)          = value_column
+       this%ldoc_col(i)          = value_column
+       this%rdoc_col(i)          = value_column
        this%somc_fire_col(i)     = value_column  
        this%som_c_leached_col(i) = value_column
        this%somhr_col(i)         = value_column
@@ -1058,26 +1058,27 @@ contains
       end do
     end associate
 
-    ! Labile dissolved organic carbon (Ldoc)
+    ! Labile dissolved organic carbon (ldoc)
     associate(is_litter => decomp_cascade_con%is_litter ,&
               is_cwd    => decomp_cascade_con%is_cwd) 
       do k = 1, ndecomp_cascade_transitions
-         if ( is_litter(decomp_cascade_con%cascade_donor_pool(k)) ) then
+         if ( is_litter(decomp_cascade_con%cascade_donor_pool(k)) .or. &
+              is_cwd(decomp_cascade_con%cascade_donor_pool(k))) then
             do fc = 1,num_soilc
                c = filter_soilc(fc)
-               this%Ldoc_col(c) = this%Ldoc_col(c) + this%decomp_cascade_doc_col(c,k)
+               this%ldoc_col(c) = this%ldoc_col(c) + this%decomp_cascade_doc_col(c,k)
             end do
          end if
       end do
     end associate
 
-    ! Recalcitrant dissolved organic carbon (Rdoc)
+    ! Recalcitrant dissolved organic carbon (rdoc)
     associate(is_soil => decomp_cascade_con%is_soil) ! TRUE => pool is a soil pool  
       do k = 1, ndecomp_cascade_transitions
          if ( is_soil(decomp_cascade_con%cascade_donor_pool(k)) ) then
             do fc = 1,num_soilc
                c = filter_soilc(fc)
-               this%Rdoc_col(c) = this%Rdoc_col(c) + this%decomp_cascade_doc_col(c,k)
+               this%rdoc_col(c) = this%Rroc_col(c) + this%decomp_cascade_doc_col(c,k)
             end do
          end if
       end do
@@ -1093,8 +1094,8 @@ contains
                this%lithr_col(c) + &
                this%somhr_col(c)
           this%doc_col(c) = &
-               this%Ldoc_col(c) + &
-               this%Rdoc_col(c)
+               this%ldoc_col(c) + &
+               this%rdoc_col(c)
        
        end do
 

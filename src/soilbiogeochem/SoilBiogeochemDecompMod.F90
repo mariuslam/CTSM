@@ -189,8 +189,13 @@ contains
                         sminn_to_denit_decomp_cascade_vr(c,j,k) = -params_inst%dnp * pmnf_decomp_cascade(c,j,k)
                      end if
                   end if
-                  decomp_cascade_hr_vr(c,j,k) = rf_decomp_cascade(c,j,k) * (1._r8 -df_decomp_cascade(c,j,k)) * p_decomp_cpool_loss(c,j,k)
-                  decomp_cascade_doc_vr(c,j,k) = df_decomp_cascade(c,j,k) * (1._r8 - rf_decomp_cascade(c,j,k)) * p_decomp_cpool_loss(c,j,k)
+                  if (rf_decomp_cascade(c,j,k)+df_decomp_cascade(c,j,k) >= 1._r8) then
+                     write(iulog,*) 'Decomposition fractions too large: c:',c,'j',j,'k', &
+                     k,'rf_decomp_cascade',rf_decomp_cascade(c,j,k),"rf_decomp_cascade",df_decomp_cascade(c,j,k)
+                     call endrun('ecomposition fractions too large')
+                  end if
+                  decomp_cascade_hr_vr(c,j,k) = rf_decomp_cascade(c,j,k) * p_decomp_cpool_loss(c,j,k)
+                  decomp_cascade_doc_vr(c,j,k) = df_decomp_cascade(c,j,k) * p_decomp_cpool_loss(c,j,k)
                   decomp_cascade_ctransfer_vr(c,j,k) = (1._r8 - rf_decomp_cascade(c,j,k) - df_decomp_cascade(c,j,k)) * p_decomp_cpool_loss(c,j,k)
                   if (decomp_method == mimics_decomp) then
                      decomp_cascade_hr_vr(c,j,k) = min( &
