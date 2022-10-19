@@ -536,7 +536,7 @@ contains
          ! enforce initialization with 0 for everything
          this%excess_ice_col(bounds%begc:bounds%endc,-nlevsno+1:nlevmaxurbgrnd)=0.0_r8
          this%exice_bulk_init(bounds%begc:bounds%endc)=0.0_r8
-         !call this%exicestream%Init(bounds, NLFilename) ! get initial fraction of excess ice per column
+         call this%exicestream%Init(bounds, NLFilename) ! get initial fraction of excess ice per column
          call this%exicestream%CalcExcessIce(bounds, this%exice_bulk_init)
          do c = bounds%begc,bounds%endc
             g = col%gridcell(c)
